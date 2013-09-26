@@ -4,19 +4,19 @@ use Symfony\Component\Debug\Debug;
 use Stack\LazyHttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 
-$loader = require_once __DIR__.'/../../demo-symfony2-argentina/app/bootstrap.php.cache';
+$baseLoader = require_once __DIR__.'/../../demo-symfony2-argentina/app/bootstrap.php.cache';
 Debug::enable();
 
 require_once __DIR__.'/../../demo-symfony2-argentina/app/AppKernel.php';
 
-$app = new AppKernel('prod', false);
-$app->loadClassCache();
-$lazyFactoryApp = function() { return require __DIR__.'/yolo_dev.php'; };
+$symfony2App = new AppKernel('dev', true);
+$symfony2App->loadClassCache();
+$yoloApp = function() { return require __DIR__.'/yolo_dev.php'; };
 $stack = (new Stack\Builder)
-    ->push('Stack\UrlMap', ['/dev_mode' => new LazyHttpKernel($lazyFactoryApp)]
-    );
+    ->push('Stack\UrlMap', ['/yolo2' => new LazyHttpKernel($yoloApp)]
+);
 
-$app = $stack->resolve($app);
+$app = $stack->resolve($symfony2App);
 
 $request = Request::createFromGlobals();
 $response = $app->handle($request);

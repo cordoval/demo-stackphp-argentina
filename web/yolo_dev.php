@@ -1,15 +1,19 @@
 <?php
 
-use Stack\LazyHttpKernel;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Debug\Debug;
+require_once __DIR__.'/../../demo-yolo-argentina/vendor/autoload.php';
 
-$loader = require_once __DIR__.'/../app/bootstrap.php.cache';
-Debug::enable();
+$container = Yolo\createContainer(
+    [
+        'debug' => true,
+    ],
+    [
+        new Yolo\DependencyInjection\MonologExtension(),
+        new Yolo\DependencyInjection\ServiceControllerExtension()
+    ]
+);
 
-require_once __DIR__.'/../app/AppKernel.php';
+$app = new Yolo\Application($container);
 
-$app = new AppKernel('dev', true);
-$app->loadClassCache();
+$app->get('/app_dev.php/yolo2', 'yolo_demo_controller:indexAction');
 
-return $app;
+return $app->getHttpKernel();
